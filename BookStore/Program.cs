@@ -1,11 +1,13 @@
-﻿using BookStore.Models;
+﻿using System;
+using System.Collections.Generic;
+using BookStore.Interfaces;
+using BookStore.Models;
 
 namespace BookStore
 {
     class Program
     {
-
-        static List<Book> BookList = new List<Book>();
+        static List<IProduct> ProductList = new List<IProduct>();
 
         static void Main(string[] args)
         {
@@ -23,21 +25,24 @@ namespace BookStore
                         AddBook();
                         break;
                     case "2":
-                       ViewSpecificBook();
+                        AddAudiobook();
                         break;
                     case "3":
-                        ViewAllBooks();
+                        AddLoanableBook();
                         break;
                     case "4":
-                        Console.WriteLine("Closing the application. Goodbye!");
+                        ViewAllProducts();
                         break;
                     case "5":
+                        Console.WriteLine("Closing the application..");
+                        return;
+                    case "6":
                         Console.WriteLine("Invalid choice. Please try again.");
                         break;
                 }
-               Console.ReadKey();
+
+                Console.ReadKey();
                 Console.Clear();
-               
             }
         }
 
@@ -45,62 +50,86 @@ namespace BookStore
         {
             Console.WriteLine("\nChoose an option:");
             Console.WriteLine("1. Add a book");
-            Console.WriteLine("2. Search for a specific book");
-            Console.WriteLine("3. View all books");
-            Console.WriteLine("2. Exit");
-           
+            Console.WriteLine("2. Add an audiobook");
+            Console.WriteLine("3. Borrow a book");
+            Console.WriteLine("4. View all products");
+            Console.WriteLine("5. Exit");
         }
 
-        static void AddBook ()
+        static void AddBook()
         {
-            Console.Write("Enter the title: ");
+            Console.Write("Enter the title of the book: ");
             string title = Console.ReadLine();
 
-            Console.Write("Enter the author: ");
+            Console.Write("Enter the author of the book: ");
             string author = Console.ReadLine();
 
-            Console.Write("Enter the ISBN: ");
+            Console.Write("Enter the ISBN of the book: ");
             string isbn = Console.ReadLine();
 
-            Book newBook = new Book { Title = title, Author = author, ISBN = isbn };
-            BookList.Add(newBook);
+            Book book = new Book { Title = title, Author = author, ISBN = isbn };
+            ProductList.Add(book);
 
             Console.WriteLine("Book was added successfully!");
-            
         }
-        static void ViewSpecificBook()
+
+        static void AddAudiobook()
         {
+            Console.Write("Enter the title of the audiobook: ");
+            string title = Console.ReadLine();
+
+            Console.Write("Enter the narrator of the audiobook: ");
+            string narrator = Console.ReadLine();
+
+            Audiobook audiobook = new Audiobook { Title = title, Narrator = narrator };
+            ProductList.Add(audiobook);
+
+            Console.WriteLine("The Audiobook was added successfully!");
+        }
+
+        static void AddLoanableBook()
+        {
+            Console.Write("Enter the title of the book: ");
+            string title = Console.ReadLine();
+
+            Console.Write("Enter the author of the book: ");
+            string author = Console.ReadLine();
+
             Console.Write("Enter the ISBN of the book: ");
-            string IsbnSearch = Console.ReadLine();
+            string isbn = Console.ReadLine();
 
-            Book book = BookList.Find(book  => book.ISBN == IsbnSearch);
+            Console.Write("Enter the desired loan period (in days): ");
+            int loanPeriod = Convert.ToInt32(Console.ReadLine());
 
-            if (book != null)
+            Console.Write("Enter your name: ");
+            string borrower = Console.ReadLine();
+
+            LoanableBook loanableBook = new LoanableBook
             {
-                Console.WriteLine($"Title: {book.Title}");
-                Console.WriteLine($"Author: {book.Author}");
-                Console.WriteLine($"ISBN: {book.ISBN}");
+                Title = title,
+                Author = author,
+                ISBN = isbn,
+                LoanPeriod = loanPeriod,
+                Borrower = borrower
+            };
+
+            ProductList.Add(loanableBook);
+
+            Console.WriteLine("The book was added successfully!");
+        }
+
+        static void ViewAllProducts()
+        {
+            if (ProductList.Count > 0)
+            {
+                foreach (var product in ProductList)
+                {
+                    Console.WriteLine(product.DisplayInfo());
+                }
             }
             else
             {
-                Console.WriteLine("Book not found.");
-                Console.ReadKey();
-            }
-        }
-
-        static void ViewAllBooks()
-        {
-            if (BookList.Count > 0)
-            {
-                foreach (var book in BookList)
-                {
-                    Console.WriteLine($"Title: {book.Title}, Author: {book.Author}, ISBN: {book.ISBN} ");
-                }
-            }
-            else 
-            {
-                Console.WriteLine("There is currently no books available in the bookstore.");
-                Console.ReadKey();
+                Console.WriteLine("There are currently no products available in the store.");
             }
         }
     }
